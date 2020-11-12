@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-if   [[ "$OS" == "WindowsNT" ]]
+if   [[ "$OS" == "Windows_NT" ]]
 then
 	echo "detected Microsoft $OS $(uname)"
 	config/configure-win-mingw.sh > Makefile.mingw
