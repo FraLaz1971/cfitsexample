@@ -3,6 +3,8 @@
 #it needs to compile the cfitsio NASA library
 # https://heasarc.gsfc.nasa.gov/docs/software/fitsio/c/c_user/cfitsio.html
 #it links the static libary src/cfitsio/libcfitsio.a
+#you need gnu mak gcc and bash to compile the project 
+#(msys or msys2 bash and mingw gcc on MS win)
 
 #instructions to build on linux
 ./configure
