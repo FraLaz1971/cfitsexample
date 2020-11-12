@@ -14,6 +14,6 @@ src/read_first_fitsfile src/mycb
 
 #instruction to build on MS win (mingw)
 ./configure
-make -f Makefile.mingw
+mingw32-make -f Makefile.mingw
 #it creates the executable files
 src/read_first_fitsfile.exe src/mycb.exe
