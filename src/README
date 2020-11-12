@@ -1,0 +1,5 @@
+#to read the header of the first HDU (IMAGE)
+fdump  new.fit[0] STDOUT - -
+#to read 2nd HDU content
+fdump  new.fit[2] STDOUT - -
+

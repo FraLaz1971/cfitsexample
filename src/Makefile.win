@@ -1,0 +1,28 @@
+CC	= gcc -g -O
+RM	= rm -f
+TARGET 	= mycb
+OBJ	= $(TARGET).o
+CPPFLAGS = -Icfitsio
+LDFLAGS = cfitsio\libcfitsio.a -lm
+DATASET = numbers.txt
+
+all: mycb
+
+$(TARGET).o: $(TARGET).c
+	$(CC) -c $(TARGET).c $(CPPFLAGS) -o $(TARGET).o
+
+$(TARGET): $(TARGET).o
+	$(CC) $(TARGET).o -o $(TARGET) $(LDFLAGS)
+
+.PHONY: clean all plot data cleanplot
+
+clean:
+	$(RM) $(OBJ) $(TARGET) $(DATASET)
+
+data: $(TARGET)
+	./$(TARGET) > $(DATASET)
+
+plot: data
+	gnuplot -p -e "plot '"$(DATASET)"'"
+
+cleanplot: clean

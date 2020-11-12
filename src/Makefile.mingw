@@ -1,0 +1,42 @@
+CC	= gcc -g -O
+RM	= rm -f
+EEXT	= .exe
+OEXT	= .o
+TARGET1 = mycb
+TARGET2 = read_first_fitsfile
+OBJ	= $(TARGET1)$(OEXT) $(TARGET2)$(OEXT)
+CPPFLAGS = -Icfitsio
+LDFLAGS = cfitsio/libcfitsio.a -lm
+DATASET = numbers.txt
+TARGETS = $(TARGET1)$(EEXT) $(TARGET2)$(EEXT)
+
+all: mycb
+
+#TARGET1 is mycb
+
+$(TARGET1)$(OEXT): $(TARGET).c
+	$(CC) -c $(TARGET).c $(CPPFLAGS) -o $(TARGET)$(OEXT)
+
+$(TARGET1)$(EEXT): $(TARGET).$(OEXT)
+	$(CC) $(TARGET)$(OEXT) -o $(TARGET)$(EEXT) $(LDFLAGS)
+
+#TARGET2 is read_first_fitsfile
+
+$(TARGET2)$(OEXT): $(TARGET).$(OEXT)
+	$(CC) -c $(TARGET).c $(CPPFLAGS) -o $(TARGET)$(OEXT)
+
+$(TARGET2)$(EEXT): $(TARGET)$(OEXT)
+	$(CC) $(TARGET)$(OEXT) -o $(TARGET)$(EEXT) $(LDFLAGS)
+
+.PHONY: clean all plot data cleanplot
+
+clean:
+	$(RM) $(OBJ) $(TARGETS) $(DATASET)
+
+data: $(TARGET1)
+	./$(TARGET1) > $(DATASET)
+
+plot: data
+	gnuplot -p -e "plot '"$(DATASET)"'"
+
+cleanplot: clean
