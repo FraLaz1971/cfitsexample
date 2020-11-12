@@ -1,0 +1,17 @@
+#example c program reading from a fits file
+#and processing data.
+#it needs to compile the cfitsio NASA library
+# https://heasarc.gsfc.nasa.gov/docs/software/fitsio/c/c_user/cfitsio.html
+#it links the static libary src/cfitsio/libcfitsio.a
+
+#instructions to build on linux
+./configure
+make -f Makefile.lnx
+#it creates the executable files
+src/read_first_fitsfile src/mycb
+
+#instruction to build on MS win (mingw)
+./configure
+make -f Makefile.mingw
+#it creates the executable files
+src/read_first_fitsfile.exe src/mycb.exe

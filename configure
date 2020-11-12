@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+if   [[ "$OS" == "WindowsNT" ]]
+then
+	echo "detected Microsoft $OS $(uname)"
+	config/configure-win-mingw.sh > Makefile.mingw
+elif [[ $(uname) == "Linux" ]]
+then
+	echo "detected GNU/linux $OS"
+	uname -a
+	lsb_release -a
+	config/configure.sh > Makefile.lnx
+elif [[ $(uname) == "Darwin" ]]
+then
+	echo "detected Apple $OS $(uname)"
+	config/configure-mac.sh > Makefile.mac
+else
+	echo "unknow OS"
+fi
+echo "generated Makefile"
+ls -lhrt Makefile*
+echo "you can now run:"
+echo "make"
+echo "to see all generate files type:"
+echo "ls -alhrt"
