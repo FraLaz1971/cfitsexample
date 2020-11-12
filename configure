@@ -18,7 +18,9 @@ else
 fi
 echo "generated Makefile"
 ls -lhrt Makefile*
-echo "you can now run:"
+echo "if you're on GNU/Linux or Mac you can now run:"
 echo "make"
+echo "if you're on MS win you can now run:"
+echo "mingw32-make"
 echo "to see all generate files type:"
 echo "ls -alhrt"
