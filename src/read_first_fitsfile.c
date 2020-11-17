@@ -1,21 +1,29 @@
+/* this is a simple template program reading a FITS binary table 
+ processing doing science analysis operations and saving the output on files. 
+ Every program which uses the CFITSIO interface must include the
+ the fitsio.h header file.  This contains the prototypes for all
+ the routines and defines the error status values and other symbolic
+ constants used in the interface. fralaz1971@gmail.com November 2020
+*/
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-/*
-  Every program which uses the CFITSIO interface must include the
-  the fitsio.h header file.  This contains the prototypes for all
-  the routines and defines the error status values and other symbolic
-  constants used in the interface.  
-*/
 #include "fitsio.h"
+/* symbolic constants */
+#define CMAX 1024 /* max num of column in the table */
+#define RMAX 1024 /* max num of rows in the table */
 /* global variables */
+int c1; struct PrimaryHeader;
 char *filename;
+char **header_hdu1; int nkey_hdu1;
+char **header_hdu2; int nkey_hdu2;
 /* functions definitions */
 int main( int argc, char **argv );
 void readheader( char *fname );
 void readtable( char *fname );
 void printerror( int status);
+void show_header(char ** hs, int nkeys);
 /* functions implementation */
 int main(int argc, char **argv)
 {
@@ -24,54 +32,101 @@ int main(int argc, char **argv)
         readheader    - read and print the header keywords in every extension
         readtable     - read columns of data from ASCII and binary tables
     **************************************************************************/
+    char * filename;
         if (argc != 2)
         {
                 fprintf(stderr, "usage:%s <filename.fit>\n", argv[0]);
                 return EXIT_FAILURE;
         } else {
 	    filename = malloc(128*sizeof(char));
-            readheader(argv[1]);
-            readtable(argv[1]);
+       nkey_hdu1 = 1024; nkey_hdu2 = 1024;
+       header_hdu1 = (char **)malloc(nkey_hdu1 * 80 * sizeof(char));  
+        for(int c1=1; c1<=nkey_hdu1;c1++ ){
+            header_hdu1[c1-1] = (char *)malloc(80*sizeof(char)); 
+        }
+
+       header_hdu2 = (char **)malloc(nkey_hdu2 * 80 * sizeof(char));  
+        for(int c1=1; c1<=nkey_hdu2;c1++ ){
+            header_hdu2[c1-1] = (char *)malloc(80*sizeof(char)); 
+        }
+
+        readheader(argv[1]);
+/*            readtable(argv[1]); */
+        show_header(header_hdu1, nkey_hdu1); 
+        show_header(header_hdu2, nkey_hdu2); 
             printf("\nAll the %s routines ran successfully.\n", argv[0]);
 	    free(filename);
+        free(header_hdu1);
+        free(header_hdu2);
             return EXIT_SUCCESS;
         }
 }
 
 /*--------------------------------------------------------------------------*/
+/* the readheader function reads the header(s) of all the HDUs
+ * in the fits data file and loads the content in a memory structure
 /*--------------------------------------------------------------------------*/
-void readheader ( char *fname )
+void readheader( char *fname )
 
     /**********************************************************************/
     /* Print out all the header keywords in all extensions of a FITS file */
     /**********************************************************************/
 {
-    fitsfile *fptr;       /* pointer to the FITS file, defined in fitsio.h */
-
-    int status, nkeys, keypos, hdutype, ii, jj;
-    filename = fname;     /* name of existing FITS file   */
+    int status, nkeys, keypos, hdutype; 
+    int ii; /* cursor on the HDUs */
+    int jj; /* cursor un the keys records */
     char card[FLEN_CARD];   /* standard string lengths defined in fitsioc.h */
+    filename = fname;     /* name of existing FITS file   */
+    fitsfile *fptr;       /* pointer to the FITS file, defined in fitsio.h */
 
     status = 0;
 
+    /* open the fits file */
     if ( fits_open_file(&fptr, filename, READONLY, &status) ) 
          printerror( status );
 
     /* attempt to move to next HDU, until we get an EOF error */
     for (ii = 1; !(fits_movabs_hdu(fptr, ii, &hdutype, &status) ); ii++) 
     {
+        fprintf(stderr, "readheader(): prcessing HDU  #%d:\n", ii);
         /* get no. of keywords */
         if (fits_get_hdrpos(fptr, &nkeys, &keypos, &status) )
             printerror( status );
 
-        printf("Header listing for HDU #%d:\n", ii);
+        fprintf(stderr, "readheader(): the header for HDU #%d contains %d keywords\n", ii, nkeys);
+        /* save the number of keys as a globla variable */
+
+        if (ii==1)
+            nkey_hdu1 = nkeys; 
+        if (ii==2)
+            nkey_hdu2 = nkeys;
+        /* setup the dimension strings array containing the primary header 
+        header_hdu1 = (char **)malloc(nkey_hdu1 * 80 * sizeof(char));  
+        for(int c1=1; c1<=nkey_hdu1;c1++ ){
+            header_hdu1[c1-1] = (char *)malloc(80*sizeof(char)); 
+        }
+        */
+        fprintf(stderr, "readheader(): Header listing for HDU #%d:\n", ii);
         for (jj = 1; jj <= nkeys; jj++)  {
             if ( fits_read_record(fptr, jj, card, &status) )
                  printerror( status );
+            fprintf(stderr, "%s\n", card); /* print the keyword card on stderr */
+            /* save the complete card in the string array */
+            if (ii==1)
+                strcpy(header_hdu1[jj-1], card);
+            else 
+                strcpy(header_hdu2[jj-1], card);
 
-            printf("%s\n", card); /* print the keyword card */
+            /* extract the KEYWORD name */
+            /* extract the VALUE */
+            /* extract the content */
+            /* header_hdu1=header_hdu1+640;*/
         }
         printf("END\n\n");  /* terminate listing with END */
+        jj=1;
+        fprintf(stderr, "readheader(): Header scanning for HDU #%d:\n", ii);
+        if ( fits_read_record(fptr, jj, card, &status) )
+                 printerror( status );
     }
 
     if (status == END_OF_FILE)   /* status values are defined in fitsioc.h */
@@ -239,3 +294,24 @@ void printerror( int status)
     }
     return;
 }
+
+/* prints on the screen all the strings in the read header */
+void show_header(char ** hs, int nkeys){
+    fprintf(stderr, "**** show_header() START ***\n");
+    int pn=0;
+    for(c1=0; c1<=nkeys; c1++){
+/*        fprintf("show_header() card%d: %s\n", c1, hs[c1]); */
+        fprintf(stderr, "show_header() card%d: %s\n", c1, hs[c1]); 
+    }
+
+    fprintf(stderr, "**** show_header() STOP ***\n");
+}
+
+struct PrimaryHeader
+{
+    char simple[40];
+    int bitpix;
+    int naxis;
+    int extend;
+    char *comments[];
+};
