@@ -1,11 +1,12 @@
 #/usr/bin/env bash
 echo "generating total makefile for $(uname) $OS ..." >/dev/stderr
-a=0;t=0;TARGETS="";RMTARGETS=""
+a=0;t=0;TARGETS="";RMTARGETS=""; EEXT=".exe";OEXT=".o"
 echo 'CC=gcc -g -O2'
+echo 'MAKE = make'
 echo 'SRC = $(wildcard src/*.c)'
 echo "OBJ = src/*.o"
-echo 'CPPFLAGS = -Iinclude -Isrc/cfitsio'
-echo 'LIBS = src/cfitsio/libcfitsio.a'
+echo 'CPPFLAGS = -Iinclude -Isrc -I/src/fun'
+echo 'LIBS = src/fun/libfun.a'
 echo 'LDFLAGS = -lm'
 for t in $(ls -1 src/*.c)
 do
@@ -17,36 +18,36 @@ do
 done
 echo 'TARGETS' = $TARGETS
 echo 'RMTARGETS' = $RMTARGETS
-echo 'all: cfitsio $(TARGETS)'
-echo '#cfitsio lib target'
-echo 'cfitsio: src/cfitsio/libcfitsio.a'
-echo
-echo 'src/cfitsio/libcfitsio.a:'
-echo -e "\t"' bash buildcfitsio.sh'
-echo 'cleancfitsio:'
-echo -e "\t"' bash cleancfitsio.sh'
+echo 'all: libfun $(TARGETS)'
+echo '#creating libfun'
+echo 'all: $(TARGETS)'
+echo 'libfun: src/fun/functions.o'
+echo -e "\t"'cd src/fun && $(MAKE)'
+echo 'cleanlibfun: src/fun/functions.o'
+echo -e "\t"'cd src/fun && $(MAKE) clean'
 a=0
 for s in $(ls -1 src/*.c)
 do
 	TARGET=$(basename ${s%.*})
 	echo '$(TARGET'$a').o: src/'$TARGET'.c'
 	echo -e "\t"'$(CC) -c   $< -o src/'$TARGET'.o $(CPPFLAGS)'
-	if [[ $TARGET != "analysis" ]]
+	if [[ $TARGET != "src/analysis" ]]
 	then
 		echo '$(TARGET'$a'): src/'$TARGET'.o'
 		echo -e "\t"'$(CC) $< $(LIBS) -o src/'$TARGET' $(LDFLAGS)'
 	else
-		echo 'analysis:'
+		echo 'src/analysis.o:'
+		echo -e "\t"'$(CC) $< $(LIBS) -o src/'analysis' $(LDFLAGS)'
 	fi
 	a=$(($a+1)) 
 done
 echo 'echo created all targets' >/dev/stderr
 echo 'install: all'
 echo -e '\tmv $(TARGETS) bin'
-echo '.PHONY: clean cleancfitsio distclean'
-echo 'clean:'
+echo '.PHONY: clean distclean cleanlibfun'
+echo 'clean: cleanlibfun'
 echo -e "\t"'rm -f $(OBJ) $(RMTARGETS)'
-echo 'distclean: clean cleancfitsio'
+echo 'distclean: clean'
 echo -e "\trm -f bin/* Makefile* *.fit *.fits *.csv *.ssv *.tsv *.dat *.txt *.log"
 echo "generating dirs" >/dev/stderr
 if ! test -d bin; then mkdir  bin; fi

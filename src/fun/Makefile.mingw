@@ -1,0 +1,28 @@
+CC = gcc -g -O
+RM = rm -f
+OEXT = .o
+EEXT = .exe
+SLEXT = .a
+AR = ar rcs
+TARGET = testlibfun
+
+all: libfun$(SLEXT) $(TARGET)$(EEXT)
+
+$(TARGET)$(OEXT):
+
+$(TARGET)$(EEXT): libfun$(SLEXT)
+
+test:
+	./$(TARGET)$(EEXT) table.csv 2 2
+
+functions$(OEXT): functions.c
+	$(CC) -c functions.c
+
+libfun$(SLEXT): functions$(OEXT) plot$(OEXT)
+	$(AR) libfun.a functions$(OEXT)
+
+clean:
+	$(RM) libfun$(SLEXT) functions$(OEXT) $(TARGET)$(EEXT)
+
+.PHONY: clean test
+

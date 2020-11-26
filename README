@@ -1,11 +1,15 @@
 #example c program reading from a fits file
-#and processing data.
+#and processing data using graphic functions and saving data on png.
 #it needs to compile the cfitsio NASA library
 # https://heasarc.gsfc.nasa.gov/docs/software/fitsio/c/c_user/cfitsio.html
 #it links the static libary src/cfitsio/libcfitsio.a
 #you need gnu make gcc, gfortran and bash to compile the project 
 #(msys or msys2 bash and mingw gcc, gfortran on MS win)
-
+#it also need to compile the zlib data compression library 
+#the libpng graphic library 
+# http://libpng.org/pub/png/libpng.html
+# and the plotutils science graphics library package
+# https://www.gnu.org/software/plotutils/
 #instructions to build on linux
 ./configure
 make -f Makefile.lnx
