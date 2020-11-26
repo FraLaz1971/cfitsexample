@@ -4,7 +4,6 @@ LIBZDIR=src/libpng-1.6.37/zlib-1.2.11
 cd $LIBZDIR
 ZROOTDIR=$(pwd); ZPREFIX="$ZROOTDIR"/../../libpng
 ./configure --prefix="$ZPREFIX" 2>&1 | tee configure_$(date --iso).log
-exit 1
 make 2>&1 | tee build_zlib_$(date --iso).log
 make install 2>&1 | tee install_zlib_$(date --iso).log
 # build libpng
