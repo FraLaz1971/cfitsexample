@@ -53,7 +53,7 @@ echo -e 'src/cfitsio/zlib/trees.o src/cfitsio/zlib/uncompr.o src/cfitsio/zlib/zc
 echo -e 'src/cfitsio/zlib/zuncompress.o src/cfitsio/zlib/zutil.o'
 echo -e "\t"'./buildcfitsio.sh;cd src/cfitsio && $(MAKE) && cp libcfitsio.a ../'
 echo 'cleanlibfun:'
-echo -e "\t"'cd src/fun && $(MAKE) clean'
+echo -e "\t"'cd src/fun && $(MAKE) clean; rm -f testlibfun'
 echo 'cleancfitsio:'
 echo -e "\t"'cd src/cfitsio && $(MAKE) clean; rm -f *.log *.fit cfitsio.pc'
 a=0
