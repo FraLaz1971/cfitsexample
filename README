@@ -15,9 +15,13 @@
 make -f Makefile.lnx
 #it creates the executable files
 src/read_first_fitsfile src/mycb
+# to run test app on GNU/Linux
+src/mycb
 
 #instruction to build on MS win (mingw)
 ./configure
 mingw32-make -f Makefile.mingw
 #it creates the executable files
 src/read_first_fitsfile.exe src/mycb.exe
+# to run test app on MS Win msys2 terminal
+src/mycb.exe

@@ -8,7 +8,7 @@
   the routines and defines the error status values and other symbolic
   constants used in the interface.  
 */
-#include "fitsio.h"
+#include "cfitsio/fitsio.h"
 
 int main( void );
 void writeimage( void );
